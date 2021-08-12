@@ -1,0 +1,150 @@
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>СЛАЙДЕР С СВАЙПОМ</title>
+  <style>
+	.slider__wrapper {position:relative; overflow:hidden;}
+	.slider__items > div {height:400px;}
+	.slider__item-slid-0 {background:green;}
+	.slider__item-slid-1 {background:blue;}
+	.slider__item-slid-2 {background:red;}
+	.slider__item-slid-3 {background:yellow;}
+	[class*='slid-ind-'] {width:20px; height: 20px; border-radius:50px;background:grey;}
+  </style>
+</head>
+
+<body>
+  <header>Хедер </header>
+  <section style="width:100%; height:100px; background:orange;"></section>  
+  <section>  
+  
+	<div class="slider__wrapper">
+		<div class="slider__items" id="slider">
+			<div class="slider__item active slider__item-slid-0"> Содержимое №1. (будет как блок так и картинка) </div>
+			<div class="slider__item slider__item-slid-1"> Содержимое №2. (будет как блок так и картинка) </div>
+			<div class="slider__item slider__item-slid-2"> Содержимое №3. (будет как блок так и картинка) </div>
+			<div class="slider__item slider__item-slid-3"> Содержимое №4. (будет как блок так и картинка) </div>
+		</div>
+		<div class="slider__indicator" id="indicator">
+			<label class="slider__indicator-item active" onclick="javascript:selectSlide(0)"></label>
+			<label class="slider__indicator-item" onclick="javascript:selectSlide(1)"></label>
+			<label class="slider__indicator-item" onclick="javascript:selectSlide(2)"></label>
+			<label class="slider__indicator-item"onclick="javascript:selectSlide(3)" ></label>
+		</div>
+		<div class="slider__arrows">
+			<button class="slider__arrow slider__arrow-left" onclick="javascript:previosSlide()">В лево</button>
+			<button class="slider__arrow slider__arrow-right" onclick="javascript:nextSlide()">В право</button>
+		</div>		
+	</div>	
+	
+  </section>
+  <section style="width:100%; height:100px; background:orange;"></section>  
+  <footer>Футер</footer>
+</body>
+
+<script>
+	// Активный слайд
+	let active = 0;
+	// Находит комаонент слайдера
+	const itemsDiv = document.querySelector('#slider');
+	// Получает список слайдов
+	const items = itemsDiv.querySelectorAll('div');
+	// Получает длину слайдов
+	const { length } = items;
+	
+
+	/*
+		Реализация интервала
+	*/
+	function getClearInterval() {
+		return setInterval(() => {
+			selectSlide(getActualActiveNext());
+		}, 4000);
+	}
+
+	/*
+		Запуск следующего слайда через интервал
+	*/
+	function startWithDuration() {
+		// Ссылка на сброс интервала
+		let refreshInterval = getClearInterval();	
+		// Прослушиватель наведения мыши на слайдер
+		itemsDiv.addEventListener('mouseover', () => {
+			clearInterval(refreshInterval);
+		});
+		// Прослушиватель уведения мыши со слайдера
+		itemsDiv.addEventListener('mouseout', () => {
+			refreshInterval = getClearInterval();
+		});
+	}
+
+	/**
+	 * Функция переключающая слайд по номеру
+	 * @param slideId
+	 * */
+	function selectSlide(slideId) {
+		// Проходит по списку слайдов
+		for (let i = 0; items[i]; i++) {
+			const slide = items[i];
+			// Если порядковый номер слайда соответствует целевому
+			if (slideId === i) {
+				slide.classList.add('active');
+				active = i;
+			} else {
+				slide.classList.remove('active');
+			}
+		}
+		// Устанавливает активный индикатор
+		const indicator = document.querySelector('#indicator');
+		const indicatorItems = indicator.querySelectorAll('label');
+		for (let i = 0; indicatorItems[i]; i++) {
+			const indItem = indicatorItems[i];
+			if (i === active) {
+				indItem.classList.add('active');
+			} else {
+				indItem.classList.remove('active');
+			}
+		}
+	}
+	/*
+		Функция переключения на предыдущий слайд
+	*/
+	function previosSlide() {
+		const targetSlide = active - 1 < 0 ? length - 1 : active - 1;
+		selectSlide(targetSlide);
+	}
+	/*
+		Вспомог. функ.
+		Получает актуальный следующий слайд
+	*/
+	function getActualActiveNext() {
+		return active + 1 >= length ? 0 : active + 1;
+	}
+	/*
+		Функция переключения на
+	*/
+	function nextSlide() {
+		const targetSlide = getActualActiveNext();
+		selectSlide(targetSlide);
+	}
+  // Для включения интервала, раскоментировать следующую строку
+	// startWithDuration();
+</script>
+<link rel="stylesheet" href="css/style.css">
+</html>
+<!--
+ХОЧУ СДЕЛАТЬ ЗАГОТОВКУ ПОД УНИВЕРСАЛЬНЫЙ СЛАЙДЕР!!!
+
+Внешний вид не имееет значения. Главное чтобы работало.
+
+1. Если блок "slid-1" Находится в зоне видимости то к блоку с классом "slid-ind-1" ДОБАВЛЯЕТСЯ класс "actind"
+
+2. Должен работать свайп по блокам со стилем "sliderr-block"
+
+3. В конце скрипта должна быть ЗАКОММЕНТИРОВАННАЯ строка которая запускает слайдер для автоматической прокрутки. Смена слайдера через 4 секунды.
+3.1 Если мне нужна автоматическая прокрутка - то я просто разкомментирую...
+
+
+-->

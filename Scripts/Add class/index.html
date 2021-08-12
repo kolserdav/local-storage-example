@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+ 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Добавление нового класу к существующему</title>
+</head>
+ 
+<body>
+	<div class="konteiner-1">блок-1</div>
+  <div class="konteiner-2">блок-2</div>
+	<!--  Название класса нужно передавать в аргумент class, а агрумент style будет работать если только будет содержать валидные css ключ/значение-->
+	<button onclick="javascript:addClassByClick(event)" class="knopka-1"> 1</button>
+  <script>
+    // Переделано под одну кнопку
+    function addClassByClick(event) {
+      const button = event.target;
+      // Получает массив классов кнопки
+      const { classList } = button;
+       //// Получает индекс
+      // Устанавливает регулярное выражение постоянного класса содержащего индекс
+      const buttonReg = new RegExp(/knopka-\d+/);
+      // Инициализируем переменную перед циклом for
+      let index;
+      for (let i = 0; classList[i]; i ++) {
+        const className = classList[i];
+        // Временно присваивает результат проверки по рег выр или null
+        index = !index ? className.match(buttonReg) : index;
+        // Если не null значит это класс с префиксом knopka-
+        if (index) {
+          // Получает строку из результата работы match
+          index = index ? index[0] : null;
+          // Выбирает число из названия удалив лишнее
+          index = index ? index.replace('knopka-', '') : null;
+        }
+      }
+      // Определив индекс добавляет класс если нет и удаляет если он есть.
+      button.classList.toggle(`actknp-${index}`);
+    
+      //// Добавляет/удаляет класс другому элементу
+      // Ищет ссылку на элемент по индексу
+      // Здесь показан пример с поиском из всего дом дерева документа по названию класса, 
+      // В задании закладки 1 получали доступ через parentElement кнопки и далее querySelector по тегу, независимо от имени класса,
+      // а исходя от от parentElement, здесь подругому, поэтому важно чтобы индекс у knopka и konteiner был одинаков.
+      const elem = document.querySelector('.konteiner-1');
+      // Добавляет/удаляет класс
+      elem.classList.toggle('actblocks');
+      // Добавить удалить класс второму элементу
+      const elem2 = document.querySelector('.konteiner-2');
+      elem2.classList.toggle('actblocks');
+    }
+  </script>
+</body> 
+</html>
+
+<!-- Описание
+4. Добавить забрать классы по клику.
+4.1 Есть ссылка или кнопка с классом <button style=”knopka-1”></button> при клике на ней:
+4.1.0 к блоку с классом <div class=”konteiner-1”></div> добавляется класс “act-1” тоисть блок принимает вид <div class=”konteiner-1 act-1”></div>
+4.1.1 к самой кнопке добавляется класс “actknp-1” тоисть кнопка стает такого вида <button style=”knopka-1 actknp-1”></button>
+4.1.2 Если кликнуть по <button style=”knopka-1 actknp-1”></button> то ВСЕ добавленные классы убираются.
+
+4.2 ИНОГДА НУЖНО  тоже самое только при клике на кнопке должны добавиться и убраться классы к разным блокам.
+Тоисть при клике блок <div class=”konteiner-2”></div> должен стать <div class=”konteiner-2 act-2”></div> и т.д.
+---------------------
+Сделать 1 рабочй контейнер и показать как добавить клвсы к новым блокам чтобы когда нужно можно было добавить:
+блок <div class=”konteiner-2”></div> который должен стать <div class=”konteiner-2 act-2”></div>
+
+-->

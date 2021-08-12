@@ -1,0 +1,89 @@
+body {
+  margin: 0;
+}
+
+.slider__wrapper {
+  z-index: 1;
+  position: relative;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+.slider__items {
+  position: relative;
+  height: 400px;
+}
+
+/*
+  Анимация выхода новой картинки
+*/
+@keyframes slide-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+  Анимация ухода старой картинки
+*/
+@keyframes slide-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.slider__item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  visibility: hidden;
+  animation: slide-out 0.5s ease-out;
+  transition: visibility 0.5s ease-out;
+}
+
+.slider__item.active {
+  visibility: visible;
+  animation: slide-in 0.5s ease-in;
+  transition: visibility 0.5s ease-in;
+}
+
+.slider__indicator {
+  z-index: 2;
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider__indicator-item {
+  cursor: pointer;
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border: 2px solid gray;
+  border-radius: 15px;
+  margin: 5px;
+}
+
+.slider__indicator-item.active {
+  cursor: default;
+  border: 2px solid black;
+}
+
+.slider__arrows {
+  z-index: 2;
+  margin: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}

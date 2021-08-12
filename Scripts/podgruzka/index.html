@@ -1,0 +1,38 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Подгрузка рекламы</title>
+</head>
+<body>
+  <div class="reklama"></div> 
+  <button class="podgryzka" onclick="javascript:addAds()"></button>
+</body>
+<script>
+  // Время ожидания подгрузки в миллисекундах.
+  const TIMEOUT = 2000;
+  /**
+   * Функция добавления рекламного блока
+   * */ 
+    function addAds() {
+    const adsBlock = document.querySelector('.reklama');
+    const frame = document.createElement('iframe');
+    frame.src = '/Scripts/podgruzka/reklama.html';
+    adsBlock.appendChild(frame);
+  }
+  // Чтобы убедится что страница загружена ждем события onload
+  window.onload = () => {
+    // Несмотря на то что в интернете говорят что onload говорит о полной загрузке страницы,
+    // всё - же из опыта на очень больших страницах я знаю что рендер (отрисовка дом) здесь может быть не закончен
+    // то есть он будет отрисован на активноек окно, но контент расположенный за пределами активного окна не факт что отрисовался.
+    // Поэтому чтобы не грузить основной поток, нужно использовать ассинхронную функцию
+    // setTimeout - как раз ассинхронная функция с таймером обратного отсчета, даже если время (второй аргумент) будет стоять 0, 
+    // всё равно первый аргумент (колбек функция) поместится в event loop и не будет грузить основной поток, а выполнится только тогда,
+    // когда освободится основной поток, при условии что перед ней в очереди (event loop) уже нет других задач.
+    setTimeout(() => {
+      addAds();
+    }, TIMEOUT);
+  };
+</script>
+</html>

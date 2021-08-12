@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+ 
+<head>
+	<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Добавление файла нового стиля ниже основного</title>
+  <link href="/Scripts/Add style file/styles.css" rel="stylesheet">
+</head>
+ 
+<body>
+	<div class="ramka">	
+		<input id="checkbox1" type="checkbox">	
+	</div>
+ 
+  <script>
+		// Задаем имя поля хранилища
+		const STORE_CHECKBOX_NAME = '_checkbox1-is-checked';
+		
+		// Ссылка на файл со светлой темой пришлось переименовать в латиницу
+		// для обращения к файлу по протоколу http, так как по протоколу file 
+		// Mozilla не подгружала заголовки
+		const LIGHT_STYLES_PATH = '/Scripts/Add style file/styles.css';
+		// Ссылка на файл с темной темой
+		const DARK_STYLES_PATH = '/Scripts/Add style file/styles-black.css';
+		// Ищщет ссылку на чекбокс
+		const checkbox = document.querySelector('#checkbox1');
+	
+		// Навешивает прослушиватель элементу checkbox
+		// В отличие от закладки-1 где вместо навешивания прослушивателя
+		// мы создавали именованную функцию и передавали её в onclick аттрибута элемента так как там не было у кнопки уникального аттрибута
+		// здесь прослушиватель, так как элемент имеет аттрибут id, который по определению должен быть уникальным.
+		checkbox.addEventListener('click', (event) => {
+			const { checked } = event.target;
+			localStorage.setItem(STORE_CHECKBOX_NAME, checked ? '1' : '0');
+			setStylesByCheckbox();
+		});
+
+		function setStylesByCheckbox() {
+			// Ставит само значение чекбокса
+			// Берет текущее значение из хранилища и в зависимости от значения ставит его чекбоксу
+			const currentValue = localStorage.getItem(STORE_CHECKBOX_NAME);
+			if (currentValue === '1') {
+				checkbox.checked = true;
+			} else {
+				checkbox.checked = false;
+			}
+
+			//// Меняет тему
+			// Берет ссылку на блок head
+			const { head } = document;
+			// Удаляет из head лишний атрибут стилей
+			if (currentValue === '0') {
+				const darkTheme = head.querySelector(`link[href="${DARK_STYLES_PATH}"]`);
+				if (darkTheme) {
+					head.removeChild(darkTheme);
+				}
+			} else {
+				// Создает элемент link наделяет его аттрибутами и вставляет в head
+				const linkElem = document.createElement('link');
+				linkElem.href = currentValue === '0' ? LIGHT_STYLES_PATH : DARK_STYLES_PATH;
+				linkElem.rel = 'stylesheet';
+				head.appendChild(linkElem);
+			}
+		}
+		setStylesByCheckbox();
+  </script>
+</body> 
+</html>
+
+<!-- Описание
+1.1 если чекбокс с id="checkbox1" стает активным то под существующим стилем должен появится новый:
+
+<head>
+	<link href="/styles.css" rel="stylesheet">
+	<link href="/styles-black.css" rel="stylesheet">
+</head>
+<body>
+	<input id="checkbox1" type="checkbox" checked>
+</body>
+
+1.2 Если чекбокс стает не активным  то добавлений стиль (<link href="/styles-black.css" rel="stylesheet">) убирается!
+1.3 !!! При переходе по страницам сайта браузер должен запоминать положение чекбокса!!!
+-->

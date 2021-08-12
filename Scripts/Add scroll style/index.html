@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+ 
+<head>
+	<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Добавление стиля при прокрутке вних</title>
+  <style>
+	[class*='bloks-'] {width:100%; height:600px; text-align:center; padding:40px;}
+	.bloks-1 {background: red;}
+	.bloks-2 {background: green;}
+	.bloks-3 {background: yellow;}
+	.bloks-4 {background: aqua;}
+	[class*='bloks-'].activbl {background: black;}
+  </style>  
+</head>
+ 
+<body>
+	<div class="ramka">	
+		<div class="bloks-0">Блок 0 к нему нечего не применяется</div>
+		<div class="bloks-1">Блок 1</div>
+		<div class="bloks-2">Блок 2</div>
+		<aside>
+			<div class="bloks-3">Блок 3</div>
+		</aside>
+		<div class="bloks-4">Блок 4</div>	
+	</div>
+	<script async src="/js/startScrollHandler.js"></script>
+  <script>
+		// Так правильно запускать скрипты, которые нужно сначала подгрузить
+		window.onload = () => {
+			startScrollHandler();
+		}
+  </script>
+</body> 
+</html>
+
+<!-- Описание
+1. При прокрутке вниз если блок (bloks-1, bloks-2, bloks-3, bloks-4) верхней частью поднимается 100рх от низа экрана то к нему добавляется клас- (.activbl) - такой блок должен стать черным.
+2. Если происходит прокрутка вверх, верхней частью опустится 100рх до низа экрана, то добавленые классы - убираются!
+-->

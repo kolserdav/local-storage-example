@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Local storage example</title>
+</head>
+<!-- Список элементов -->
+<body>
+<div id="00-1">
+	<h3>Заголовок 1</h3>
+	<div>Содержимое новости 1</div>
+	<span class="urlnews">/all/news-1.html</span>
+	<button name="favorite" onclick="javascript:add(event)">В закладки</button>
+</div>
+
+<div id="00-2">
+	<h3>Заголовок 2</h3>
+	<div>Содержимое новости 2</div>
+	<span class="urlnews">/all/news-2.html</span>
+	<button name="favorite" onclick="javascript:add(event)">В закладки</button>
+</div>
+
+<div id="00-3">
+	<h3>Заголовок 3</h3>
+	<div>Содержимое новости 3</div>
+	<span class="urlnews">/all/news-3.html</span>
+	<button name="favorite" onclick="javascript:add(event)">В закладки</button>
+</div>
+
+
+<!-- Блок закладок -->
+<div class="zakladki">
+	<s class="zakld-kolich"></s>
+	<ul></ul>
+</div>
+
+
+<script>
+ 			
+/***************************************
+ * ZAKLADKI
+ **************************************/
+  //// Глобальные переменные
+      // Название поля в localStorage хранящего список закладок 
+      const BOOKMARKS_NAME = '_any_unique_for_this_domain';
+      
+      /*
+      * Функция получения закладок из локального хранилища
+      * вынесено для переиспользования
+      */
+      function getBookmarks() {
+        // Получает уже сохраненные закладки из lS
+        let bookmarks = localStorage.getItem(BOOKMARKS_NAME);
+        // Если это первое сохранение то есть в lS оказалось пустое значение по BOOKMARKS_NAME ключу, 
+        // то задает закладкам серриализованное значение в виде пустого массива
+        bookmarks = !bookmarks ? "[]" : bookmarks;
+        // Парсит серриализованную строку в JSON объект
+        return JSON.parse(bookmarks);
+      }
+
+      /*
+      * Функция для сохранения закладок в хранилище
+      * @bookmarks - объект закладок
+      */
+     function setBookmarks(bookmarks) {
+       // Записывает в хранилище закладки, предварительно их серриализовав в строку 
+       localStorage.setItem(BOOKMARKS_NAME, JSON.stringify(bookmarks));
+     } 
+
+      /*
+      * Функция отрисовывающая закладки из локального хранилища
+      */
+      function createBookmarks() {
+        let bookmarks = getBookmarks();
+        // ПРАВКИ!!! По пункту 1.3 добавил установку класса кнопкам после перезагрузки
+        const buttons = document.querySelectorAll('button[name="favorite"]');
+        for (let i = 0; buttons[i]; i++) {
+          const button = buttons[i];
+          const parentEl = button.parentElement;
+          const id = parentEl.getAttribute('id');
+          let _buttonClicked = false;
+          bookmarks.map((bookmark) => {
+            if (bookmark.id === id) {
+              _buttonClicked = true;
+            }
+          });
+          if (_buttonClicked) {
+            button.classList.add('zakl-button-vzakl');
+          } 
+        }
+        // Ищет по класу родительский элемент списка закладок
+        const bookmarksDiv = document.querySelector('.zakladki');
+        // ПРАВКИ!!! 1.1 Если в блок (. zakladki) добавляется закладка то к нему же добавить класс (.akt-zakladki).
+        if (bookmarks.length !== 0) {
+          bookmarksDiv.classList.add('akt-zakladki'); 
+        } else {
+          bookmarksDiv.classList.remove('akt-zakladki');
+        }
+        // Получает тег ul внутри блока с классом zakladki
+        const ul = bookmarksDiv.querySelector('ul');
+        // Чистит список закладок, перед отрисовкой
+        ul.innerHTML = '';
+        // Проходит по всему массиву с сохраненными закладками и добавляет в список
+        bookmarks.map((bookmark, index) => {
+          // Здесь показан пример создания элементов DOM при момощи метода createElement объекта document
+          // Создает элемент li
+          const li = document.createElement('li');
+          // Создает элемент a для закладки
+          const aBkm = document.createElement('a');
+          // Ставит для закладки отрибут href
+          aBkm.href = bookmark.link;
+          // Ставит заголовок
+          aBkm.innerText = bookmark.header;
+          // Добавляет в li закладку дочерним компонентом
+          li.appendChild(aBkm);
+
+          // Элемент с пробелом, можно удалить и обыграть стилями
+          const space = document.createElement('span');
+          space.innerHTML = '&nbsp;';
+          li.appendChild(space);
+
+          // Создает элемент a для кнопки удалить и ставит ей аттрибуты
+          const aDel = document.createElement('a');
+          aDel.href = `javascript:delItem("${bookmark.id}")`;
+          aDel.innerText = 'удалить';
+          li.appendChild(aDel);
+          // Добавляет li в список ul
+          ul.appendChild(li);
+          // ПРАВКИ!!! 1.2 Если в блок (. zakladki) добавляется закладка то в дочерний блок с стилем (.zakld-kolich) добавляется число отображающее количество элементов <li>*</li>
+          if (!bookmarks[index + 1]) {
+            const kolichDiv = document.createElement('li');
+            kolichDiv.innerHTML = bookmarks.length;
+            kolichDiv.classList.add('zakld-kolich');
+            ul.appendChild(kolichDiv);
+          }
+        });
+        // 
+      }
+
+      // Прослушиватель события загрузки страницы
+      window.onload = () => {
+        createBookmarks();
+      };
+      
+      /**
+       * Функция добавления в закладки
+       * @e - событие event передаваемое в onclick="javascript:add(event)"   
+       * */
+      function add(e) {
+        //--1--// Получение данных из блоков при нажатии на кнопку
+        // Определяет нажатую кнопку по событию
+        const targetButton = e.target;
+        // ПРАВКИ!!! 1.3 Если нажали на кнопку (<button onclick="javascript:add(event)">В закладки</button>) и закладка добавилась в блок (. zakladki) то к самой кнопке добавить класс (.zakl-button-vzakl)
+        targetButton.classList.add('zakl-button-vzakl');
+        // Получает родительский элемент блока с нажатой кнопкой 
+        const parentElement = targetButton.parentElement;
+        // Берет ид родительского элемента
+        const id = parentElement.getAttribute('id');
+        // Находит по селектору span блок содержащий ссылку
+        const span = parentElement.querySelector('span');
+        // Достаёт ссылку из span
+        const link = span.innerText;
+        // Находит в блоке заголовок h3
+        const h3 = parentElement.querySelector('h3');
+        // Получает заголовок
+        const header = h3.innerText;
+        
+        //--2--// Сохранение закладок в локальное хранилище браузера
+        let bookmarks = getBookmarks();
+        // Проходит по каждому элементу массива и если ид одного из юнитов равен
+        // добавляемому, то возвращает true
+        const checkBookmarks = bookmarks.some((bookmark) => bookmark.id === id);
+        // Если проверочный массив оказался не пустой, то выводит предупреждение и выходит из функции
+        if (checkBookmarks) {
+          alert('Закладка добавлена ранее');
+          return;
+        }
+        // Добавляет в массив закладок новый объект с ключами id, link, header 
+        // и значениями id, link, header полученных в первом этапе.
+        bookmarks.push({
+          id,
+          link,
+          header,
+        })
+        // Записывает в хранилище закладки, предварительно их серриализовав в строку 
+        setBookmarks(bookmarks);
+
+        //--3--// Добавление элементов с закладками
+        createBookmarks();
+      }
+      /**
+       * Функция удаления из закладок
+       * @id - id закладки для удаления
+       * */
+      function delItem(id) {
+        const bookmarks = getBookmarks();
+        // Проходит по закладкам из хранилища и если юнит с не удаляемым id
+        // то вставляет его в новый массив newBookmarks
+        let newBookmarks = bookmarks.map((bookmark) => {
+          if (bookmark.id !== id) return bookmark;
+          // Удаляет класс из кнопки
+          const parentElement = document.getElementById(bookmark.id);
+          if (parentElement) {
+            parentElement.querySelector('.zakl-button-vzakl').classList.remove('zakl-button-vzakl');
+          }
+          // Если это удаляемый юнит, то на его место в новый массив вставляет undefined
+          return undefined;
+        });
+        // Фильтрует новый массив закладок, удаляя undefined элумент
+        newBookmarks = newBookmarks.filter((bookmark) => bookmark !== undefined);
+        // сохраняет в хранилизе
+        setBookmarks(newBookmarks);
+        // Запускает скрипт отрисовки закладок
+        createBookmarks();
+      }
+</script>
+</body>
+</html>
